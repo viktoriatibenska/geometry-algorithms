@@ -22,6 +22,8 @@ int btnHeight = 40;
 color btnColor, btnHighlight;
 /* Background color */
 color bColor;
+/* Gift wrapping, graham scan highlight color */
+color giftWrappingColor, grahamScanColor;
 
 /* Boolean variables specifying whether mouse is over said buttons or not */
 boolean randomBtnOver = false;
@@ -72,6 +74,8 @@ void setup() {
   bColor = color(0, 26, 51);
   btnColor = color(242);
   btnHighlight = color(150);
+  giftWrappingColor = color(39, 249, 151);
+  grahamScanColor = color(252, 196, 27);
   
   font = createFont("Arial", 18);
   textFont(font); 
@@ -104,7 +108,7 @@ void draw() {
   
   /* If mouse is over gift wrapping button, set color to highlight, otherwise use btnColor */
   if (giftWrappingBtnOver) {
-    fill(btnHighlight);
+    fill(giftWrappingColor);
   } else {
     fill(btnColor);
   }
@@ -113,7 +117,7 @@ void draw() {
   
   /* If mouse is over graham scan button, set color to highlight, otherwise use btnColor */
   if (grahamScanBtnOver) {
-    fill(btnHighlight);
+    fill(grahamScanColor);
   } else {
     fill(btnColor);
   }
@@ -150,25 +154,20 @@ void draw() {
   
   stroke(255);
   strokeWeight(3);
-  for(Line l : lines) {
-    line(l.getFromX(), l.getFromY(), l.getToX(), l.getToY());
-  }
+  drawLines(lines);
 
   if (grahamScan != null) {
     grahamScan = grahamScan(points);
-    stroke(252, 196, 27);
+    stroke(grahamScanColor);
     strokeWeight(3);
-    for(Line l : grahamScan.getLines()) {
-      line(l.getFromX(), l.getFromY(), l.getToX(), l.getToY());
-    }
+    drawLines(grahamScan.getLines());
   }
 
   if (giftWrap != null) {
-    stroke(39, 249, 151);
+    giftWrap = giftWrapping(points);
+    stroke(giftWrappingColor);
     strokeWeight(3);
-    for(Line l : giftWrap.getLines()) {
-      line(l.getFromX(), l.getFromY(), l.getToX(), l.getToY());
-    }
+    drawLines(giftWrap.getLines());
   }
   
   /* Draw every point from the points list */
@@ -198,6 +197,8 @@ void mousePressed() {
   } 
   else if (grahamScanBtnOver) {
     grahamScan = grahamScan(points);
+    lines.clear();
+    giftWrap = null;
   }
   else if (giftWrappingBtnOver) {
     giftWrap = giftWrapping(points);
@@ -225,12 +226,12 @@ void mousePressed() {
       
       /* If no point was found at mouse coordinates, create a new one. */
       if (movingIndex == -1) {
-        addPoint();
+        points = addPoint(points);
       }
     } 
     /* If the right mouse button was clicked, delete the point at current coordinates, if there is one. */
     else if (mouseButton == RIGHT) {
-      removePoint();
+      points = removePoint(points);
     }
   }
 }
@@ -273,21 +274,6 @@ void update() {
   }
 }
 
-/* Function generates new random points.
-   The number of points generates is "randomPointsNum". */
-void generateRandomPoints() {
-  float x, y;
-  
-  for (int i = 0; i < randomPointsNum; i++) {
-    /* The bounds of randomization specified, so that the points generated will
-       be centralized, in order to eliminate too wide of a dispersion. */
-    x = random(pointDiameter + width/5, width*4/5 - pointDiameter);
-    y = random(pointDiameter + btnHeight + height/6, height*5/6 - pointDiameter);
-    
-    points.add(new PVector(x, y));
-  }
-}
-
 /* Functions clears the screen by deleting all existing points. */
 void clearScreen() {
   points.clear();
@@ -296,80 +282,18 @@ void clearScreen() {
   giftWrap = null;
 }
 
-/* Function adds point at current mouse position. */
-void addPoint() {
-  points.add(new PVector(mouseX, mouseY));
-}
-
-/* Function deletes a point at the current mouse position, if there is one. */
-void removePoint() {
-  /* Go through the list of points */
-  for (PVector p : points) {
-    /* Check whether mouse is over current point, and if so, remove it. */
-    if (overPoint(p.x, p.y)) {
-      points.remove(p);
-      break;
-    }
-  }
-}
-
-/*
-Function gets coordinates x and y, width and height of a button and checks whether
-the current mouse position is in a rectangle (button) with those attributes.
-
-Returns: true if mouse is within a rectangle
-         false if mouse isn't within a rectangle
-*/
-boolean overBtn(int x, int y, int width, int height)  {
-  if (mouseX >= x && mouseX <= x+width && mouseY >= y && mouseY <= y+height) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-/*
-Function gets coordinates x and y and checks whether the current
-mouse position is in a circle with those coordinates and diameter
-"pointDiameter".
-
-Returns: true if mouse is within a point
-         false if mouse isn't within a point
-*/
-boolean overPoint(float x, float y) {
-  float disX = x - mouseX;
-  float disY = y - mouseY;
-  if (sqrt(sq(disX) + sq(disY)) < pointDiameter/2 ) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-/*
-Function checks, whether the position specified by coordinates
-x and y is valid or not. Invalid position is if the coordinates
-are out of bounds of the screen dimentions, or if it is in the
-buttons area.
-
-Returns: true if position is valid
-         false if position is invalid
-*/
-boolean invalidArea(float x, float y) {
-  float pointRadius = pointDiameter / 2;
+/* Function generates new random points.
+   The number of points generates is "randomPointsNum". */
+void generateRandomPoints() {
+  println("GENERATING RANDOM POINTS");
+  float x, y;
   
-  // Out of bounds width-wise
-  if (x - pointRadius < 0 || x + pointRadius > width) {
-    return true;
+  for (int i = 0; i < randomPointsNum; i++) {
+    /* The bounds of randomization specified, so that the points generated will
+       be centralized, in order to eliminate too wide of a dispersion. */
+    x = random(pointDiameter + width/10, width*9/10 - pointDiameter);
+    y = random(pointDiameter + btnHeight + height/12, height*11/12 - pointDiameter);
+    
+    points.add(new PVector(x, y));
   }
-  // Out of bounds height-wise
-  if (y - pointRadius < 0 || y + pointRadius > height) {
-    return true;
-  }
-  // In the buttons area
-  if (x - pointRadius < numOfBtns * btnWidth && y - pointRadius < btnHeight) {
-    return true;
-  }
-  
-  return false;
 }

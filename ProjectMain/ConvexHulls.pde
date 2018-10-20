@@ -5,7 +5,6 @@ Polygon giftWrapping(ArrayList<PVector> points) {
 
   Polygon result = null;
   PVector pivot = null;
-  ArrayList<PVector> chosenPoints = new ArrayList<PVector>();
 
   for (PVector p : points) {
     if (pivot == null) {
@@ -17,28 +16,39 @@ Polygon giftWrapping(ArrayList<PVector> points) {
 
   if (pivot != null) {
     result = new Polygon();
-    result.addPoint(pivot);
 
-    PVector candidate = choosePoint(pivot, points, result.getPoints());
-    while (candidate != null && !candidate.equals(pivot)) {
-      result.addPoint(candidate);
-      candidate = choosePoint(candidate, points, result.getPoints());
-    }
+    PVector chosenPoint = pivot;
+    PVector candidate;
+    do {
+      result.addPoint(chosenPoint);
+      candidate = points.get((points.indexOf(chosenPoint) + 1) % points.size());
+
+      for (PVector p: points) {
+        if (checkLeftTurnCriterion(chosenPoint, p, candidate)) {
+          candidate = p;
+        }
+      }
+
+      chosenPoint = candidate;
+    } while (!chosenPoint.equals(pivot));
   }
   return result;
 }
 
-PVector choosePoint(PVector basePoint, ArrayList<PVector> points, ArrayList<PVector> chosenPoints) {
-  ArrayList<Point> sortedPoints = sortPointsByAngle(points, basePoint);
-  
-  // find a point with the smallest angle, that is not already in the convex hull
-  for (Point p: sortedPoints) {
-    if (!chosenPoints.contains(p.point)) {
-      return p.point;
-    }
+/*
+  Calculates the cross product of 3 points. If the result is greater than 0,
+  the left turn criterion is fulfilled, if it is less than 0, it is not.
+*/
+boolean checkLeftTurnCriterion(PVector a, PVector b, PVector c){
+  float crossProduct = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+
+  if (crossProduct > 0){
+    return true;
+  } else {
+    return false;
   }
-  return null;
 }
+
 
 ArrayList<Point> sortPointsByAngle(ArrayList<PVector> points, PVector relativeTo) {
   ArrayList<Point> result = new ArrayList<Point>();
@@ -129,18 +139,4 @@ Polygon grahamScan(ArrayList<PVector> points) {
   }
   println("Graham scan number of vertices = " + result.points.size());
   return result;
-}
-
-/*
-  Calculates the cross product of 3 points. If the result is greater than 0,
-  the left turn criterion is fulfilled, if it is less than 0, it is not.
-*/
-boolean checkLeftTurnCriterion(PVector a, PVector b, PVector c){
-  float crossProduct = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-
-  if (crossProduct >= 0){
-    return true;
-  } else {
-    return false;
-  }
 }
