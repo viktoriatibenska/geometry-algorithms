@@ -1,7 +1,6 @@
 // TODO: fix gift wrapping, probably infinite cycle
 Polygon giftWrapping(ArrayList<PVector> points) {
   println("GIFT WRAPPING");
-  lines.clear();
 
   Polygon result = null;
   PVector pivot = null;
@@ -83,7 +82,6 @@ PVector choosePivot(ArrayList<PVector> points) {
 
 Polygon grahamScan(ArrayList<PVector> points) {
   println("GRAHAM SCAN");
-  lines.clear();
   
   Polygon result = null;
   ArrayList<Point> sortedPoints = new ArrayList<Point>();
@@ -91,7 +89,7 @@ Polygon grahamScan(ArrayList<PVector> points) {
   int j;
   PVector pivot = choosePivot(points);
   
-  if (pivot != null) {
+  if (pivot != null && points.size() > 2) {
     // Sort the points by angle relative to pivot
     sortedPoints = sortPointsByAngle(points, pivot);
 
@@ -137,6 +135,5 @@ Polygon grahamScan(ArrayList<PVector> points) {
       result.addPoint(s.pop().point);
     }
   }
-  println("Graham scan number of vertices = " + result.points.size());
   return result;
 }

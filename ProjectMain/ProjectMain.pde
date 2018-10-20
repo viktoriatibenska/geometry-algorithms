@@ -10,9 +10,10 @@ int clearBtnX, clearBtnY;
 int grahamScanBtnX, grahamScanBtnY;
 int giftWrappingBtnX, giftWrappingBtnY;
 int sweepLineBtnX, sweepLineBtnY;
+int createPolygonBtnX, createPolygonBtnY;
 
 /* Current number of used buttons */
-int numOfBtns = 5;
+int numOfBtns = 6;
 
 /* Button dimensions */
 int btnWidth = 150;
@@ -31,6 +32,7 @@ boolean clearBtnOver = false;
 boolean grahamScanBtnOver = false;
 boolean giftWrappingBtnOver = false;
 boolean sweepLineBtnOver = false;
+boolean createPolygonBtnOver = false;
 
 PFont font;
 
@@ -43,23 +45,25 @@ ArrayList<PVector> points;
 /* Variable for point currently being moved by user.
    If such point doesn't exist, value is null. */
 int movingIndex = -1;
-ArrayList<Line> lines;
 
 Polygon grahamScan = null;
 Polygon giftWrap = null;
+Polygon userCreatedPolygon = null;
 
 void setup() {
   size(1500, 900);
   
   points = new ArrayList<PVector>();
-  lines = new ArrayList<Line>();
   
   /* Position of the random button */
   randomBtnX = 0;
   randomBtnY = 0;
   
-  /* Position of the clear button, relative to the random button */
-  clearBtnX = randomBtnX + btnWidth;
+  createPolygonBtnX = randomBtnX + btnWidth;
+  createPolygonBtnY = randomBtnY;
+
+  /* Position of the clear button */
+  clearBtnX = createPolygonBtnX + btnWidth;
   clearBtnY = randomBtnY;
   
   giftWrappingBtnX = clearBtnX + btnWidth;
@@ -130,10 +134,18 @@ void draw() {
     fill(btnColor);
   }
   rect(sweepLineBtnX, sweepLineBtnY, btnWidth, btnHeight);
+
+  if (createPolygonBtnOver) {
+    fill(btnHighlight);
+  } else {
+    fill(btnColor);
+  }
+  rect(createPolygonBtnX, createPolygonBtnY, btnWidth, btnHeight);
   
   /* Print button labels */
   fill(0);
   text("Random points", randomBtnX + 12, randomBtnY + 27);
+  text("Create polygon", createPolygonBtnX + 14, createPolygonBtnY + 27);
   text("Clear", clearBtnX + 48, clearBtnY + 27);
   text("Gift wrapping", giftWrappingBtnX + 22, giftWrappingBtnY + 27);
   text("Graham scan", grahamScanBtnX + 19, grahamScanBtnY + 27);
@@ -151,10 +163,6 @@ void draw() {
     }
     ellipse(points.get(movingIndex).x, points.get(movingIndex).y, pointDiameter, pointDiameter);
   }
-  
-  stroke(255);
-  strokeWeight(3);
-  drawLines(lines);
 
   if (grahamScan != null) {
     grahamScan = grahamScan(points);
@@ -168,6 +176,12 @@ void draw() {
     stroke(giftWrappingColor);
     strokeWeight(3);
     drawLines(giftWrap.getLines());
+  }
+
+  if (userCreatedPolygon != null) {
+    stroke(255);
+    strokeWeight(3);
+    drawLines(userCreatedPolygon.getLines());
   }
   
   /* Draw every point from the points list */
@@ -190,6 +204,11 @@ void mousePressed() {
   /* User presses button to generate random points. */
   if (randomBtnOver) {
     generateRandomPoints();
+  }
+  else if (createPolygonBtnOver) {
+    createPolygon();
+    grahamScan = null;
+    giftWrap = null;
   } 
   /* User presses button to clear the screen. */
   else if (clearBtnOver) {
@@ -197,13 +216,13 @@ void mousePressed() {
   } 
   else if (grahamScanBtnOver) {
     grahamScan = grahamScan(points);
-    lines.clear();
     giftWrap = null;
+    userCreatedPolygon = null;
   }
   else if (giftWrappingBtnOver) {
     giftWrap = giftWrapping(points);
-    lines.clear();
     grahamScan = null;
+    userCreatedPolygon = null;
   }
   else if (sweepLineBtnOver) {
     if (grahamScan != null) {
@@ -272,14 +291,26 @@ void update() {
   } else {
     sweepLineBtnOver = false;
   }
+
+  /* Check create polygon button */
+  if (overBtn(createPolygonBtnX, createPolygonBtnY, btnWidth, btnHeight)) {
+    createPolygonBtnOver = true;
+  } else {
+    createPolygonBtnOver = false;
+  }
 }
 
 /* Functions clears the screen by deleting all existing points. */
 void clearScreen() {
   points.clear();
-  lines.clear();
   grahamScan = null;
   giftWrap = null;
+  userCreatedPolygon = null;
+}
+
+void createPolygon() {
+  println("CREATING POLYGON");
+  userCreatedPolygon = new Polygon(points);
 }
 
 /* Function generates new random points.

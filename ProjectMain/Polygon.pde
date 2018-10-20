@@ -7,6 +7,11 @@ public class Polygon {
         this.lines = new ArrayList<Line>();
     }
 
+    public Polygon(ArrayList<PVector> points) {
+        this.points = points;
+        this.lines = new ArrayList<Line>();
+    }
+
     public void addPoint(PVector point) {
         this.points.add(point);
     }
@@ -16,13 +21,13 @@ public class Polygon {
     }
 
     public ArrayList<Line> getLines() {
-        lines.clear();
-        for (int i = 0; i < points.size() - 1; i++) {
-            lines.add(new Line(points.get(i).x, points.get(i).y, points.get(i+1).x, points.get(i+1).y));
+        this.lines.clear();
+        for (int i = 0; i < this.points.size() - 1; i++) {
+            this.lines.add(new Line(this.points.get(i).x, this.points.get(i).y, this.points.get(i+1).x, this.points.get(i+1).y));
         }
-        lines.add(new Line(points.get(points.size()-1).x, points.get(points.size()-1).y, points.get(0).x, points.get(0).y));
+        this.lines.add(new Line(this.points.get(this.points.size()-1).x, this.points.get(points.size()-1).y, this.points.get(0).x, this.points.get(0).y));
 
-        return lines;
+        return this.lines;
     }
 
     public ArrayList<PVector> sortPoints() {
