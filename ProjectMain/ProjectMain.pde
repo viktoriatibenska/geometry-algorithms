@@ -5,13 +5,14 @@ Declaration of global variables
 */
 
 /* Buttons coordinates */
-int randomBtnX, randomBtnY;
-int clearBtnX, clearBtnY;
-int grahamScanBtnX, grahamScanBtnY;
-int giftWrappingBtnX, giftWrappingBtnY;
-int sweepLineBtnX, sweepLineBtnY;
-int createPolygonBtnX, createPolygonBtnY;
-int orthogonalSearchBtnX, orthogonalSearchBtnY;
+int btnY = 0;
+int randomBtnX = 0;
+int clearBtnX;
+int grahamScanBtnX;
+int giftWrappingBtnX;
+int sweepLineBtnX;
+int createPolygonBtnX;
+int kdTreeBtnX;
 
 /* Current number of used buttons */
 int numOfBtns = 7;
@@ -34,6 +35,7 @@ boolean grahamScanBtnOver = false;
 boolean giftWrappingBtnOver = false;
 boolean sweepLineBtnOver = false;
 boolean createPolygonBtnOver = false;
+boolean kdTreeBtnOver = false;
 
 PFont font;
 
@@ -58,25 +60,12 @@ void setup() {
   
   points = new ArrayList<PVector>();
   
-  /* Position of the random button */
-  randomBtnX = 0;
-  randomBtnY = 0;
-  
   createPolygonBtnX = randomBtnX + btnWidth;
-  createPolygonBtnY = randomBtnY;
-
-  /* Position of the clear button */
   clearBtnX = createPolygonBtnX + btnWidth;
-  clearBtnY = randomBtnY;
-  
   giftWrappingBtnX = clearBtnX + btnWidth;
-  giftWrappingBtnY = randomBtnY;
-  
   grahamScanBtnX = giftWrappingBtnX + btnWidth;
-  grahamScanBtnY = randomBtnY;
-
   sweepLineBtnX = grahamScanBtnX + btnWidth;
-  sweepLineBtnY = randomBtnY;
+  kdTreeBtnX = sweepLineBtnX + btnWidth;
   
   bColor = color(0, 26, 51);
   btnColor = color(242);
@@ -102,7 +91,7 @@ void draw() {
     fill(btnColor);
   }
   /* Draw random button */
-  rect(randomBtnX, randomBtnY, btnWidth, btnHeight);
+  rect(randomBtnX, btnY, btnWidth, btnHeight);
   
   /* If mouse is over clear button, set color to highlight, otherwise use btnColor */
   if (clearBtnOver) {
@@ -111,7 +100,7 @@ void draw() {
     fill(btnColor);
   }
   /* Draw clear button */
-  rect(clearBtnX, clearBtnY, btnWidth, btnHeight);
+  rect(clearBtnX, btnY, btnWidth, btnHeight);
   
   /* If mouse is over gift wrapping button, set color to highlight, otherwise use btnColor */
   if (giftWrappingBtnOver) {
@@ -120,7 +109,7 @@ void draw() {
     fill(btnColor);
   }
   /* Draw gift wrapping button */
-  rect(giftWrappingBtnX, giftWrappingBtnY, btnWidth, btnHeight);
+  rect(giftWrappingBtnX, btnY, btnWidth, btnHeight);
   
   /* If mouse is over graham scan button, set color to highlight, otherwise use btnColor */
   if (grahamScanBtnOver) {
@@ -129,30 +118,38 @@ void draw() {
     fill(btnColor);
   }
   /* Draw graham scan button */
-  rect(grahamScanBtnX, grahamScanBtnY, btnWidth, btnHeight);
+  rect(grahamScanBtnX, btnY, btnWidth, btnHeight);
 
   if (sweepLineBtnOver) {
     fill(btnHighlight);
   } else {
     fill(btnColor);
   }
-  rect(sweepLineBtnX, sweepLineBtnY, btnWidth, btnHeight);
+  rect(sweepLineBtnX, btnY, btnWidth, btnHeight);
 
   if (createPolygonBtnOver) {
     fill(btnHighlight);
   } else {
     fill(btnColor);
   }
-  rect(createPolygonBtnX, createPolygonBtnY, btnWidth, btnHeight);
+  rect(createPolygonBtnX, btnY, btnWidth, btnHeight);
+
+  if (kdTreeBtnOver) {
+    fill(btnHighlight);
+  } else {
+    fill(btnColor);
+  }
+  rect(kdTreeBtnX, btnY, btnWidth, btnHeight);
   
   /* Print button labels */
   fill(0);
-  text("Random points", randomBtnX + 12, randomBtnY + 27);
-  text("Create polygon", createPolygonBtnX + 14, createPolygonBtnY + 27);
-  text("Clear", clearBtnX + 48, clearBtnY + 27);
-  text("Gift wrapping", giftWrappingBtnX + 22, giftWrappingBtnY + 27);
-  text("Graham scan", grahamScanBtnX + 19, grahamScanBtnY + 27);
-  text("Sweep line", sweepLineBtnX + 31, sweepLineBtnY + 27);
+  text("Random points", randomBtnX + 12, btnY + 27);
+  text("Create polygon", createPolygonBtnX + 14, btnY + 27);
+  text("Clear", clearBtnX + 48, btnY + 27);
+  text("Gift wrapping", giftWrappingBtnX + 22, btnY + 27);
+  text("Graham scan", grahamScanBtnX + 19, btnY + 27);
+  text("Sweep line", sweepLineBtnX + 31, btnY + 27);
+  text("k-D Tree", kdTreeBtnX + 40, btnY + 27);
   
   /* Draw moving point, if the user is moving one */
   if (movingIndex != -1) {
@@ -239,6 +236,9 @@ void mousePressed() {
     userCreatedPolygon = null;
     lines = null;
   }
+  else if (kdTreeBtnOver) {
+    kdTree();
+  }
   else if (sweepLineBtnOver) {
     if (grahamScan != null) {
       lines = sweepLine(grahamScan);
@@ -281,45 +281,52 @@ void mousePressed() {
 /* When called, function updates the values of ___BtnOver variables, according to the current mouse position */
 void update() {
   /* Check random button */
-  if (overBtn(randomBtnX, randomBtnY, btnWidth, btnHeight)) {
+  if (overBtn(randomBtnX, btnY, btnWidth, btnHeight)) {
     randomBtnOver = true;
   } else {
     randomBtnOver = false;
   }
   
   /* Check clear button */
-  if (overBtn(clearBtnX, clearBtnY, btnWidth, btnHeight)) {
+  if (overBtn(clearBtnX, btnY, btnWidth, btnHeight)) {
     clearBtnOver = true;
   } else {
     clearBtnOver = false;
   }
   
   /* Check graham scan button */
-  if (overBtn(grahamScanBtnX, grahamScanBtnY, btnWidth, btnHeight)) {
+  if (overBtn(grahamScanBtnX, btnY, btnWidth, btnHeight)) {
     grahamScanBtnOver = true;
   } else {
     grahamScanBtnOver = false;
   }
   
   /* Check gift wrapping button */
-  if (overBtn(giftWrappingBtnX, giftWrappingBtnY, btnWidth, btnHeight)) {
+  if (overBtn(giftWrappingBtnX, btnY, btnWidth, btnHeight)) {
     giftWrappingBtnOver = true;
   } else {
     giftWrappingBtnOver = false;
   }
 
   /* Check sweep line button */
-  if (overBtn(sweepLineBtnX, sweepLineBtnY, btnWidth, btnHeight)) {
+  if (overBtn(sweepLineBtnX, btnY, btnWidth, btnHeight)) {
     sweepLineBtnOver = true;
   } else {
     sweepLineBtnOver = false;
   }
 
   /* Check create polygon button */
-  if (overBtn(createPolygonBtnX, createPolygonBtnY, btnWidth, btnHeight)) {
+  if (overBtn(createPolygonBtnX, btnY, btnWidth, btnHeight)) {
     createPolygonBtnOver = true;
   } else {
     createPolygonBtnOver = false;
+  }
+
+  /* Check create polygon button */
+  if (overBtn(kdTreeBtnX, btnY, btnWidth, btnHeight)) {
+    kdTreeBtnOver = true;
+  } else {
+    kdTreeBtnOver = false;
   }
 }
 
