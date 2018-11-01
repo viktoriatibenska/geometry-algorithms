@@ -85,3 +85,15 @@ void drawLines(ArrayList<Line> lines) {
     line(l.getFromX(), l.getFromY(), l.getToX(), l.getToY());
   }
 }
+
+ArrayList<PVector> deleteUnusedPoints(ArrayList<PVector> polygonPoints, ArrayList<PVector> points) {
+  ArrayList<PVector> result = new ArrayList<PVector>(points);
+  
+  for (PVector p: points) {
+    if (!polygonPoints.contains(p)) {
+      result.remove(p);
+    }
+  }
+
+  return result;
+}
