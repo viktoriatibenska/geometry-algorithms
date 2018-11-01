@@ -197,6 +197,7 @@ void draw() {
   }
 
   if (lines != null) {
+    strokeWeight(2);
     drawLines(lines);
   }
 }
@@ -237,7 +238,10 @@ void mousePressed() {
     lines = null;
   }
   else if (kdTreeBtnOver) {
-    kdTree();
+    lines = kdTree(points);
+    grahamScan = null;
+    giftWrap = null;
+    userCreatedPolygon = null;
   }
   else if (sweepLineBtnOver) {
     if (grahamScan != null) {
@@ -336,6 +340,7 @@ void clearScreen() {
   grahamScan = null;
   giftWrap = null;
   userCreatedPolygon = null;
+  lines = null;
 }
 
 void createPolygon() {
