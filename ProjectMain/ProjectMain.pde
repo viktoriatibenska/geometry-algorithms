@@ -11,9 +11,10 @@ int grahamScanBtnX, grahamScanBtnY;
 int giftWrappingBtnX, giftWrappingBtnY;
 int sweepLineBtnX, sweepLineBtnY;
 int createPolygonBtnX, createPolygonBtnY;
+int orthogonalSearchBtnX, orthogonalSearchBtnY;
 
 /* Current number of used buttons */
-int numOfBtns = 6;
+int numOfBtns = 7;
 
 /* Button dimensions */
 int btnWidth = 150;
@@ -49,6 +50,8 @@ int movingIndex = -1;
 Polygon grahamScan = null;
 Polygon giftWrap = null;
 Polygon userCreatedPolygon = null;
+
+ArrayList<Line> lines = null;
 
 void setup() {
   size(1500, 900);
@@ -162,17 +165,22 @@ void draw() {
       points.get(movingIndex).y = mouseY;
     }
     ellipse(points.get(movingIndex).x, points.get(movingIndex).y, pointDiameter, pointDiameter);
+
+    if (grahamScan != null) {
+      grahamScan = grahamScan(points);
+    }
+    if (giftWrap != null) {
+      giftWrap = giftWrapping(points);
+    }
   }
 
   if (grahamScan != null) {
-    grahamScan = grahamScan(points);
     stroke(grahamScanColor);
     strokeWeight(3);
     drawLines(grahamScan.getLines());
   }
 
   if (giftWrap != null) {
-    giftWrap = giftWrapping(points);
     stroke(giftWrappingColor);
     strokeWeight(3);
     drawLines(giftWrap.getLines());
@@ -189,6 +197,10 @@ void draw() {
   for (PVector p : points) {
     fill(255);
     ellipse(p.x, p.y, pointDiameter, pointDiameter);
+  }
+
+  if (lines != null) {
+    drawLines(lines);
   }
 }
 
@@ -209,6 +221,7 @@ void mousePressed() {
     createPolygon();
     grahamScan = null;
     giftWrap = null;
+    lines = null;
   } 
   /* User presses button to clear the screen. */
   else if (clearBtnOver) {
@@ -218,18 +231,28 @@ void mousePressed() {
     grahamScan = grahamScan(points);
     giftWrap = null;
     userCreatedPolygon = null;
+    lines = null;
   }
   else if (giftWrappingBtnOver) {
     giftWrap = giftWrapping(points);
     grahamScan = null;
     userCreatedPolygon = null;
+    lines = null;
   }
   else if (sweepLineBtnOver) {
     if (grahamScan != null) {
-      sweepLine(grahamScan);
+      lines = sweepLine(grahamScan);
+      points = deleteUnusedPoints(grahamScan.getPoints(), points);
     } else if (giftWrap != null) {
-      sweepLine(giftWrap);
+      lines = sweepLine(giftWrap);
+      points = deleteUnusedPoints(giftWrap.getPoints(), points);
+    } else if (userCreatedPolygon != null) {
+      lines = sweepLine(userCreatedPolygon);
+      points = deleteUnusedPoints(userCreatedPolygon.getPoints(), points);
     }
+    grahamScan = null;
+    giftWrap = null;
+    userCreatedPolygon = null;
   }
   /* User presses mouse outside of the buttons area */
   else {
