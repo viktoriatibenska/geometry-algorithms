@@ -82,6 +82,9 @@ ArrayList<PVector> removePoint(ArrayList<PVector> points) {
 
 void drawLines(ArrayList<Line> lines) {
   for(Line l : lines) {
+    if (l.getColor() != -1) {
+      stroke(l.getColor());
+    }
     line(l.getFromX(), l.getFromY(), l.getToX(), l.getToY());
   }
 }

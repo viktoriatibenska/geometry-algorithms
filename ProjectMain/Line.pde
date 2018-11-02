@@ -3,12 +3,20 @@ public class Line {
   private float fromY;
   private float toX;
   private float toY;
+  private color clr = -1;
   
   public Line (float fromX, float fromY, float toX, float toY) {
     this.fromX = fromX;
     this.fromY = fromY;
     this.toX = toX;
     this.toY = toY;
+  }
+  public Line (float fromX, float fromY, float toX, float toY, color clr) {
+    this.fromX = fromX;
+    this.fromY = fromY;
+    this.toX = toX;
+    this.toY = toY;
+    this.clr = clr;
   }
 
   public float getFromX(){
@@ -37,5 +45,12 @@ public class Line {
   }
   public void setToY(float value){
     this.toY = value;
+  }
+
+  public color getColor() {
+    return this.clr;
+  }
+  public void setColor(color clr) {
+    this.clr = clr;
   }
 }
