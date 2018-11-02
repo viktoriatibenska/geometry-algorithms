@@ -30,14 +30,41 @@ KdNode buildKdTree(ArrayList<PVector> points, int depth) {
 }
 
 ArrayList<Line> constructLines(KdNode node) {
-    ArrayList<Line> result = new ArrayList<Line>();
-    
     if (node.getLesser() == null && node.getGreater() == null) {
         return null;
     } else {
-        result.add(new Line(node.point.x, btnHeight, node.point.x, height));
+        return traverse(node, 0, width, btnHeight + 1, height);
+    }
+}
+
+ArrayList<Line> traverse(KdNode node, float leftBorder, float rightBorder, float upperBorder, float lowerBorder) {
+    ArrayList<Line> result = new ArrayList<Line>();
+    
+    // if leaf, terminate recursion
+    if (node.getLesser() == null && node.getGreater() == null) {
         return result;
     }
+    if (even(node.depth)) {
+        // vertical
+        result.add(new Line(node.point.x, upperBorder, node.point.x, lowerBorder, color(238, 57, 0)));
+        if (node.getLesser() != null) {
+            result.addAll(traverse(node.getLesser(), leftBorder, node.point.x, upperBorder, lowerBorder));
+        }
+        if (node.getGreater() != null) {
+            result.addAll(traverse(node.getGreater(), node.point.x, rightBorder, upperBorder, lowerBorder));
+        }
+    } else {
+        // horizontal
+        result.add(new Line(leftBorder, node.point.y, rightBorder, node.point.y, color(187, 229, 0)));
+        if (node.getLesser() != null) {
+            result.addAll(traverse(node.getLesser(), leftBorder, rightBorder, upperBorder, node.point.y));
+        }
+        if (node.getGreater() != null) {
+            result.addAll(traverse(node.getGreater(), leftBorder, rightBorder, node.point.y, lowerBorder));
+        }
+    }
+
+    return result;
 }
 
 boolean even(int value) {

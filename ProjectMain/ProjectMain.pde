@@ -83,7 +83,10 @@ void draw() {
   background(bColor);
   
   stroke(0);
-  
+  strokeWeight(1);
+  fill(0);
+  rect(0, 0, width, btnHeight);
+
   /* If mouse is over random button, set color to highlight, otherwise use btnColor */
   if (randomBtnOver) {
     fill(btnHighlight);
@@ -189,16 +192,18 @@ void draw() {
     drawLines(userCreatedPolygon.getLines());
   }
   
+  /* Draw the lines */
+  if (lines != null) {
+    stroke(255);
+    strokeWeight(3);
+    drawLines(lines);
+  }
+
   /* Draw every point from the points list */
   stroke(255);
   for (PVector p : points) {
     fill(255);
     ellipse(p.x, p.y, pointDiameter, pointDiameter);
-  }
-
-  if (lines != null) {
-    strokeWeight(2);
-    drawLines(lines);
   }
 }
 
