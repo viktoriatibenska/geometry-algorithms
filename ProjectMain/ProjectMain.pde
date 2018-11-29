@@ -13,12 +13,14 @@ int giftWrappingBtnX;
 int sweepLineBtnX;
 int createPolygonBtnX;
 int kdTreeBtnX;
+int delaunayTriangulationBtnX;
+int voronoiDiagramBtnX;
 
 /* Current number of used buttons */
-int numOfBtns = 7;
+int numOfBtns = 9;
 
 /* Button dimensions */
-int btnWidth = 150;
+int btnWidth = 167;
 int btnHeight = 40;
 
 /* Button color and mouseover highlight color */
@@ -36,6 +38,8 @@ boolean giftWrappingBtnOver = false;
 boolean sweepLineBtnOver = false;
 boolean createPolygonBtnOver = false;
 boolean kdTreeBtnOver = false;
+boolean delaunayTriangulationBtnOver = false;
+boolean voronoiDiagramBtnOver = false;
 
 PFont font;
 
@@ -56,7 +60,7 @@ Polygon userCreatedPolygon = null;
 ArrayList<Line> lines = null;
 
 void setup() {
-  size(1500, 900);
+  size(1504, 900);
   
   points = new ArrayList<PVector>();
   
@@ -66,6 +70,8 @@ void setup() {
   grahamScanBtnX = giftWrappingBtnX + btnWidth;
   sweepLineBtnX = grahamScanBtnX + btnWidth;
   kdTreeBtnX = sweepLineBtnX + btnWidth;
+  delaunayTriangulationBtnX = kdTreeBtnX + btnWidth;
+  voronoiDiagramBtnX = delaunayTriangulationBtnX + btnWidth;
   
   bColor = color(0, 26, 51);
   btnColor = color(242);
@@ -75,6 +81,15 @@ void setup() {
   
   font = createFont("Arial", 18);
   textFont(font); 
+}
+
+void drawButton(color highlight, boolean isOverBtn, int btnX) {
+  if (isOverBtn) {
+    fill(highlight);
+  } else {
+    fill(btnColor);
+  }
+  rect(btnX, btnY, btnWidth, btnHeight);
 }
 
 void draw() {
@@ -87,72 +102,27 @@ void draw() {
   fill(0);
   rect(0, 0, width, btnHeight);
 
-  /* If mouse is over random button, set color to highlight, otherwise use btnColor */
-  if (randomBtnOver) {
-    fill(btnHighlight);
-  } else {
-    fill(btnColor);
-  }
-  /* Draw random button */
-  rect(randomBtnX, btnY, btnWidth, btnHeight);
-  
-  /* If mouse is over clear button, set color to highlight, otherwise use btnColor */
-  if (clearBtnOver) {
-    fill(btnHighlight);
-  } else {
-    fill(btnColor);
-  }
-  /* Draw clear button */
-  rect(clearBtnX, btnY, btnWidth, btnHeight);
-  
-  /* If mouse is over gift wrapping button, set color to highlight, otherwise use btnColor */
-  if (giftWrappingBtnOver) {
-    fill(giftWrappingColor);
-  } else {
-    fill(btnColor);
-  }
-  /* Draw gift wrapping button */
-  rect(giftWrappingBtnX, btnY, btnWidth, btnHeight);
-  
-  /* If mouse is over graham scan button, set color to highlight, otherwise use btnColor */
-  if (grahamScanBtnOver) {
-    fill(grahamScanColor);
-  } else {
-    fill(btnColor);
-  }
-  /* Draw graham scan button */
-  rect(grahamScanBtnX, btnY, btnWidth, btnHeight);
-
-  if (sweepLineBtnOver) {
-    fill(btnHighlight);
-  } else {
-    fill(btnColor);
-  }
-  rect(sweepLineBtnX, btnY, btnWidth, btnHeight);
-
-  if (createPolygonBtnOver) {
-    fill(btnHighlight);
-  } else {
-    fill(btnColor);
-  }
-  rect(createPolygonBtnX, btnY, btnWidth, btnHeight);
-
-  if (kdTreeBtnOver) {
-    fill(btnHighlight);
-  } else {
-    fill(btnColor);
-  }
-  rect(kdTreeBtnX, btnY, btnWidth, btnHeight);
+  drawButton(btnHighlight, randomBtnOver, randomBtnX);
+  drawButton(btnHighlight, clearBtnOver, clearBtnX);
+  drawButton(giftWrappingColor, giftWrappingBtnOver, giftWrappingBtnX);
+  drawButton(grahamScanColor, grahamScanBtnOver, grahamScanBtnX);
+  drawButton(btnHighlight, sweepLineBtnOver, sweepLineBtnX);
+  drawButton(btnHighlight, createPolygonBtnOver, createPolygonBtnX);
+  drawButton(btnHighlight, kdTreeBtnOver, kdTreeBtnX);
+  drawButton(btnHighlight, delaunayTriangulationBtnOver, delaunayTriangulationBtnX);
+  drawButton(btnHighlight, voronoiDiagramBtnOver, voronoiDiagramBtnX);
   
   /* Print button labels */
   fill(0);
-  text("Random points", randomBtnX + 12, btnY + 27);
-  text("Create polygon", createPolygonBtnX + 14, btnY + 27);
-  text("Clear", clearBtnX + 48, btnY + 27);
-  text("Gift wrapping", giftWrappingBtnX + 22, btnY + 27);
-  text("Graham scan", grahamScanBtnX + 19, btnY + 27);
-  text("Sweep line", sweepLineBtnX + 31, btnY + 27);
-  text("k-D Tree", kdTreeBtnX + 40, btnY + 27);
+  text("Random points", randomBtnX + 23, btnY + 27);
+  text("Create polygon", createPolygonBtnX + 23, btnY + 27);
+  text("Clear", clearBtnX + 59, btnY + 27);
+  text("Gift wrapping", giftWrappingBtnX + 31, btnY + 27);
+  text("Graham scan", grahamScanBtnX + 28, btnY + 27);
+  text("Sweep line", sweepLineBtnX + 40, btnY + 27);
+  text("k-D Tree", kdTreeBtnX + 48, btnY + 27);
+  text("Delaunay triang.", delaunayTriangulationBtnX + 20, btnY + 27);
+  text("Voronoi diagrams", voronoiDiagramBtnX + 12, btnY + 27);
   
   /* Draw moving point, if the user is moving one */
   if (movingIndex != -1) {
@@ -248,6 +218,9 @@ void mousePressed() {
     giftWrap = null;
     userCreatedPolygon = null;
   }
+  else if (delaunayTriangulationBtnOver) {
+    delaunay(points);
+  }
   else if (sweepLineBtnOver) {
     if (grahamScan != null) {
       lines = sweepLine(grahamScan);
@@ -336,6 +309,18 @@ void update() {
     kdTreeBtnOver = true;
   } else {
     kdTreeBtnOver = false;
+  }
+
+  if (overBtn(delaunayTriangulationBtnX, btnY, btnWidth, btnHeight)) {
+    delaunayTriangulationBtnOver = true;
+  } else {
+    delaunayTriangulationBtnOver = false;
+  }
+
+  if (overBtn(voronoiDiagramBtnX, btnY, btnWidth, btnHeight)) {
+    voronoiDiagramBtnOver = true;
+  } else {
+    voronoiDiagramBtnOver = false;
   }
 }
 
