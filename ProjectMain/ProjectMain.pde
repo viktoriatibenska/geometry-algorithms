@@ -219,7 +219,11 @@ void mousePressed() {
     userCreatedPolygon = null;
   }
   else if (delaunayTriangulationBtnOver) {
-    delaunay(points);
+    ArrayList<ActiveEdge> dt = delaunay(points);
+    lines = getDelaunayLines(dt);
+  }
+  else if (voronoiDiagramBtnOver) {
+    voronoi();
   }
   else if (sweepLineBtnOver) {
     if (grahamScan != null) {

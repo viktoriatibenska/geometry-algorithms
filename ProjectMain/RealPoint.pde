@@ -16,4 +16,9 @@ public class RealPoint {
     public float distance(RealPoint p) {
         return (float) Math.sqrt(Math.pow(this.x - p.x, 2) + Math.pow(this.y - p.y, 2));
     }
+
+    @Override
+    public String toString() {
+        return "(x: " + this.x + ", y: " + this.y + ")";
+    }
 }

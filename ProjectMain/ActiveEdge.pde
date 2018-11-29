@@ -1,0 +1,26 @@
+public class ActiveEdge {
+    RealPoint from;
+    RealPoint to;
+    ActiveEdge next;
+    ActiveEdge twin;
+
+    public ActiveEdge(RealPoint from, RealPoint to) {
+        this.from = from;
+        this.to = to;
+        this.twin = null;
+    }
+
+    public void changeOrientation() {
+        RealPoint temp = from;
+        this.from = to;
+        this.to = temp;
+    }
+
+    public void setNext(ActiveEdge next) {
+        this.next = next;
+    }
+
+    public void setTwin(ActiveEdge twin) {
+        this.twin = twin;
+    }
+}

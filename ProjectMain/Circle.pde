@@ -14,12 +14,4 @@ public class Circle {
             return false;
         }
     }
-
-    public float crossProduct(RealPoint a, RealPoint b, RealPoint c) {
-        float u1 = b.x - a.x;
-        float v1 = b.y - a.y;
-        float u2 = c.x - a.x;
-        float v2 = c.y - a.y;
-        return u1 * v2 - v1 * u2;
-    }
 }
