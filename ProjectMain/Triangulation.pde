@@ -81,26 +81,40 @@ ArrayList<ActiveEdge> delaunay(ArrayList<PVector> points) {
       e3.setNext(twin);
       e.setTwin(twin);
       realPoints.remove(p);
+      realPoints.remove(e.to);
+      realPoints.remove(e.from);
 
-      // TODO: deal with adding edges to AEL and DT
       ActiveEdge flip = new ActiveEdge(e2.to, e2.from);
       if (isInList(flip, AEL)) {
-        
-        if (isInList(flip, DT)) {
-
-        }
+        AEL.remove(e2);
+      } else {
+        AEL.add(e2);
       }
+      // if (isInList(flip, DT)) {
+      //   DT.add(e2);
+      // }
+      flip = new ActiveEdge(e3.to, e3.from);
+      if (isInList(flip, AEL)) {
+        AEL.remove(e3);
+      } else {
+        AEL.add(e3);
+      }
+      // if (isInList(flip, DT)) {
+      //   DT.add(e3);
+      // }
+      DT.add(e2);
+      DT.add(e3);
     }
     DT.add(e);
     AEL.remove(0);
   }
 
-  return AEL;
+  return DT;
 }
 
 boolean isInList(ActiveEdge e, ArrayList<ActiveEdge> list) {
   for (ActiveEdge edge: list) {
-    if (edge.x == e.x && edge.y == e.y) {
+    if (edge.from.x == e.from.x && edge.from.y == e.from.y && edge.to.x == e.to.x && edge.to.y == e.to.y) {
       return true;
     }
   }
@@ -113,6 +127,7 @@ RealPoint findClosestDelaunay(ActiveEdge e, ArrayList<RealPoint> points) {
 
   for (RealPoint p: points) {
     float currentDistance = delaunayDistance(e.from, e.to, p);
+    println(currentDistance);
     if (isLeft(e, p) && currentDistance < distance) {
       result = p;
       distance = currentDistance;

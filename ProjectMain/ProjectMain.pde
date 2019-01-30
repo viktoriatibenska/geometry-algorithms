@@ -58,6 +58,7 @@ Polygon giftWrap = null;
 Polygon userCreatedPolygon = null;
 
 ArrayList<Line> lines = null;
+ArrayList<ActiveEdge> delaunayTriangulation = null;
 
 void setup() {
   size(1504, 900);
@@ -144,6 +145,11 @@ void draw() {
     }
   }
 
+  // if (delaunayTriangulation != null) {
+  //   delaunayTriangulation = delaunay(points);
+  //   lines = getDelaunayLines(delaunayTriangulation);
+  // }
+
   if (grahamScan != null) {
     stroke(grahamScanColor);
     strokeWeight(3);
@@ -195,6 +201,7 @@ void mousePressed() {
     grahamScan = null;
     giftWrap = null;
     lines = null;
+    delaunayTriangulation = null;
   } 
   /* User presses button to clear the screen. */
   else if (clearBtnOver) {
@@ -205,22 +212,25 @@ void mousePressed() {
     giftWrap = null;
     userCreatedPolygon = null;
     lines = null;
+    delaunayTriangulation = null;
   }
   else if (giftWrappingBtnOver) {
     giftWrap = giftWrapping(points);
     grahamScan = null;
     userCreatedPolygon = null;
     lines = null;
+    delaunayTriangulation = null;
   }
   else if (kdTreeBtnOver) {
     lines = kdTree(points);
     grahamScan = null;
     giftWrap = null;
     userCreatedPolygon = null;
+    delaunayTriangulation = null;
   }
   else if (delaunayTriangulationBtnOver) {
-    ArrayList<ActiveEdge> dt = delaunay(points);
-    lines = getDelaunayLines(dt);
+    delaunayTriangulation = delaunay(points);
+    lines = getDelaunayLines(delaunayTriangulation);
   }
   else if (voronoiDiagramBtnOver) {
     voronoi();
@@ -239,6 +249,7 @@ void mousePressed() {
     grahamScan = null;
     giftWrap = null;
     userCreatedPolygon = null;
+    delaunayTriangulation = null;
   }
   /* User presses mouse outside of the buttons area */
   else {
@@ -335,6 +346,7 @@ void clearScreen() {
   giftWrap = null;
   userCreatedPolygon = null;
   lines = null;
+  delaunayTriangulation = null;
 }
 
 void createPolygon() {
