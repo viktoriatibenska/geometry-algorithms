@@ -103,28 +103,6 @@ void draw() {
   fill(0);
   rect(0, 0, width, btnHeight);
 
-  drawButton(btnHighlight, randomBtnOver, randomBtnX);
-  drawButton(btnHighlight, clearBtnOver, clearBtnX);
-  drawButton(giftWrappingColor, giftWrappingBtnOver, giftWrappingBtnX);
-  drawButton(grahamScanColor, grahamScanBtnOver, grahamScanBtnX);
-  drawButton(btnHighlight, sweepLineBtnOver, sweepLineBtnX);
-  drawButton(btnHighlight, createPolygonBtnOver, createPolygonBtnX);
-  drawButton(btnHighlight, kdTreeBtnOver, kdTreeBtnX);
-  drawButton(btnHighlight, delaunayTriangulationBtnOver, delaunayTriangulationBtnX);
-  drawButton(btnHighlight, voronoiDiagramBtnOver, voronoiDiagramBtnX);
-  
-  /* Print button labels */
-  fill(0);
-  text("Random points", randomBtnX + 23, btnY + 27);
-  text("Create polygon", createPolygonBtnX + 23, btnY + 27);
-  text("Clear", clearBtnX + 59, btnY + 27);
-  text("Gift wrapping", giftWrappingBtnX + 31, btnY + 27);
-  text("Graham scan", grahamScanBtnX + 28, btnY + 27);
-  text("Sweep line", sweepLineBtnX + 40, btnY + 27);
-  text("k-D Tree", kdTreeBtnX + 48, btnY + 27);
-  text("Delaunay triang.", delaunayTriangulationBtnX + 20, btnY + 27);
-  text("Voronoi diagrams", voronoiDiagramBtnX + 12, btnY + 27);
-  
   /* Draw moving point, if the user is moving one */
   if (movingIndex != -1) {
     stroke(255);
@@ -144,11 +122,6 @@ void draw() {
       giftWrap = giftWrapping(points);
     }
   }
-
-  // if (delaunayTriangulation != null) {
-  //   delaunayTriangulation = delaunay(points);
-  //   lines = getDelaunayLines(delaunayTriangulation);
-  // }
 
   if (grahamScan != null) {
     stroke(grahamScanColor);
@@ -181,6 +154,28 @@ void draw() {
     fill(255);
     ellipse(p.x, p.y, pointDiameter, pointDiameter);
   }
+  
+  drawButton(btnHighlight, randomBtnOver, randomBtnX);
+  drawButton(btnHighlight, clearBtnOver, clearBtnX);
+  drawButton(giftWrappingColor, giftWrappingBtnOver, giftWrappingBtnX);
+  drawButton(grahamScanColor, grahamScanBtnOver, grahamScanBtnX);
+  drawButton(btnHighlight, sweepLineBtnOver, sweepLineBtnX);
+  drawButton(btnHighlight, createPolygonBtnOver, createPolygonBtnX);
+  drawButton(btnHighlight, kdTreeBtnOver, kdTreeBtnX);
+  drawButton(btnHighlight, delaunayTriangulationBtnOver, delaunayTriangulationBtnX);
+  drawButton(btnHighlight, voronoiDiagramBtnOver, voronoiDiagramBtnX);
+  
+  /* Print button labels */
+  fill(0);
+  text("Random points", randomBtnX + 23, btnY + 27);
+  text("Create polygon", createPolygonBtnX + 23, btnY + 27);
+  text("Clear", clearBtnX + 59, btnY + 27);
+  text("Gift wrapping", giftWrappingBtnX + 31, btnY + 27);
+  text("Graham scan", grahamScanBtnX + 28, btnY + 27);
+  text("Sweep line", sweepLineBtnX + 40, btnY + 27);
+  text("k-D Tree", kdTreeBtnX + 48, btnY + 27);
+  text("Delaunay triang.", delaunayTriangulationBtnX + 20, btnY + 27);
+  text("Voronoi diagrams", voronoiDiagramBtnX + 12, btnY + 27);
 }
 
 void mouseReleased() {
@@ -232,8 +227,8 @@ void mousePressed() {
     delaunayTriangulation = delaunay(points);
     lines = getDelaunayLines(delaunayTriangulation);
   }
-  else if (voronoiDiagramBtnOver) {
-    voronoi();
+  else if (voronoiDiagramBtnOver && delaunayTriangulation != null) {
+    lines.addAll(voronoi(delaunayTriangulation));
   }
   else if (sweepLineBtnOver) {
     if (grahamScan != null) {

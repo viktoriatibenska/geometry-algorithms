@@ -1,4 +1,3 @@
-// TODO: fix gift wrapping, probably infinite cycle
 Polygon giftWrapping(ArrayList<PVector> points) {
   println("GIFT WRAPPING");
 

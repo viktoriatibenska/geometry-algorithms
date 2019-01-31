@@ -129,9 +129,6 @@ ArrayList<ActiveEdge> delaunay(ArrayList<PVector> points) {
   DT.add(e1);
   DT.add(e2);
   DT.add(e3);
-  // println("e1", e1.from, e1.to);
-  // println("e2", e2.from, e2.to);
-  // println("e3", e3.from, e3.to);
 
   while (AEL.size() > 0) {
     ActiveEdge e = AEL.get(0);
@@ -139,7 +136,6 @@ ArrayList<ActiveEdge> delaunay(ArrayList<PVector> points) {
     twin.setTwin(e);
     p = findClosestDelaunay(twin, realPoints);
     if (p != null) {
-      //println("Closest delaunay for ", e.from, e.to, p.x, p.y);
       e2 = new ActiveEdge(twin.to, p);
       e3 = new ActiveEdge(p, twin.from);
       twin.setNext(e2);
@@ -147,6 +143,9 @@ ArrayList<ActiveEdge> delaunay(ArrayList<PVector> points) {
       e3.setNext(twin);
       e2.setTwin(e2.getOppositeOrientation());
       e3.setTwin(e3.getOppositeOrientation());
+      twin.twin.setTwin(e3);
+      e2.twin.setTwin(twin);
+      e3.twin.setTwin(e2);
 
       if (isInList(e2.twin, AEL)) {
         AEL.remove(e2);
@@ -161,15 +160,54 @@ ArrayList<ActiveEdge> delaunay(ArrayList<PVector> points) {
       DT.add(e);
       DT.add(e2);
       DT.add(e3);
-    } else {
-      //println("Closest delaunay not found for ", e.from, e.to);
     }
-    //println("---------------------------------");
-    
+    e.setTwin(twin);
     AEL.remove(e);
   }
 
   return DT;
+}
+
+ArrayList<Line> voronoi(ArrayList<ActiveEdge> dt) {
+  println("VORONOI DIAGRAMS");
+  color lineColor = color(128, 227, 0);
+  ArrayList<Line> voronoiLines = new ArrayList<Line>();
+  ArrayList<ArrayList<ActiveEdge>> previousTriplets = new ArrayList<ArrayList<ActiveEdge>>();
+
+  for (int i = 0; i < dt.size(); i++) {
+    ArrayList<ActiveEdge> edges = new ArrayList<ActiveEdge>();
+    edges.add(dt.get(i));
+    edges.add(edges.get(edges.size()-1).next);
+    edges.add(edges.get(edges.size()-1).next);
+    Circle circle = circumscribe(edges.get(0).from, edges.get(1).from, edges.get(2).from);
+    if (circle != null && uniqueEdges(edges, previousTriplets)) {
+      for (ActiveEdge e: edges) {
+        if (e.twin != null && e.twin.next != null) {
+          Circle neighbourCircle = circumscribe(e.from, e.to, e.twin.next.to);
+          if (neighbourCircle != null) {
+            voronoiLines.add(new Line(circle.center.x, circle.center.y, neighbourCircle.center.x, neighbourCircle.center.y, lineColor));
+          }
+        }
+        if (e.twin.next == null) {
+          PVector perpendicular = e.perpendicularVector();
+          PVector endPoint = new PVector(circle.center.x + perpendicular.x * circle.radius * 5, circle.center.y + perpendicular.y * circle.radius * 5);
+          voronoiLines.add(new Line(circle.center.x, circle.center.y, endPoint.x, endPoint.y, lineColor));
+        }
+      }
+    }
+    previousTriplets.add(edges);
+  }
+
+  return voronoiLines;
+}
+
+boolean uniqueEdges(ArrayList<ActiveEdge> currentEdges, ArrayList<ArrayList<ActiveEdge>> previousTriplets) {
+  for (ArrayList<ActiveEdge> p: previousTriplets) {
+    if(p.contains(currentEdges.get(0)) && p.contains(currentEdges.get(1)) && p.contains(currentEdges.get(2))) {
+      return false;
+    }
+  }
+  return true;
 }
 
 boolean isInList(ActiveEdge e, ArrayList<ActiveEdge> list) {
@@ -213,7 +251,8 @@ PVector chooseStart(ArrayList<PVector> points) {
   return pivot;
 }
 
-float delaunayDistance(RealPoint a, RealPoint b, RealPoint c) {
+Circle circumscribe(RealPoint a, RealPoint b, RealPoint c) {
+  Circle res = null;
   float num, centerX, centerY;
 
   float crossProduct = crossProduct(a, b, c);
@@ -226,8 +265,14 @@ float delaunayDistance(RealPoint a, RealPoint b, RealPoint c) {
     num = aSq * (c.x - b.x) + bSq * (a.x - c.x) + cSq * (b.x - a.x);
     centerY = num / (2.0 * crossProduct);
     RealPoint center = new RealPoint(centerX, centerY);
-    Circle circle = new Circle(center, center.distance(a));
-    
+    res = new Circle(center, center.distance(a));
+  }
+  return res;
+}
+
+float delaunayDistance(RealPoint a, RealPoint b, RealPoint c) {
+  Circle circle = circumscribe(a, b, c);
+  if (circle != null) {
     if (isLeft(a, b, circle.center)) {
       return circle.radius;
     } else {

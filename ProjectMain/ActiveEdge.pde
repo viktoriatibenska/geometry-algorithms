@@ -28,4 +28,9 @@ public class ActiveEdge {
     public void setTwin(ActiveEdge twin) {
         this.twin = twin;
     }
+
+    public PVector perpendicularVector() {
+        PVector edge = new PVector(this.to.x - this.from.x, this.to.y - this.from.y).normalize();
+        return new PVector(edge.y, -edge.x).normalize();
+    }
 }
