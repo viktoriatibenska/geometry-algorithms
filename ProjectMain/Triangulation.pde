@@ -1,28 +1,89 @@
 ArrayList<Line> sweepLine(Polygon polygon) {
   println("SWEEP LINE TRIANGULATION");
+  //color lineColor = color(128, 227, 0);
+  color lineColor = color(255);
   ArrayList<Line> result = new ArrayList<Line>();
-  ArrayList<PVector> sortedPoints = polygon.sortPoints();
   Stack<PVector> stack = new Stack<PVector>();
-  Queue<PVector> right = new LinkedList<PVector>();
-  Queue<PVector> left = new LinkedList<PVector>();
+  ArrayList<PVector> right = new ArrayList<PVector>();
+  ArrayList<PVector> left = new ArrayList<PVector>();
 
+  // Sort points lexicographically
+  ArrayList<PVector> sortedPoints = polygon.sortPoints();
   PVector first = sortedPoints.get(0);
   PVector last = sortedPoints.get(sortedPoints.size() - 1);
-
-  result.addAll(polygon.getLines());
+  
+  // Separate left and right paths
+  int indexFirst = polygon.points.indexOf(first);
+  int indexLast = polygon.points.indexOf(last);
+  int index = (indexFirst + 1) % polygon.points.size();
+  boolean switchSides;
+  if (first.x >= polygon.points.get(index).x) {
+    switchSides = false;
+  } else {
+    switchSides = true;
+  }
+  left.add(first);
+  while (index != indexFirst) {
+    if (index == indexLast) {
+      switchSides = !switchSides;
+    }
+    if (!switchSides) {
+      left.add(polygon.points.get(index));
+    } else {
+      right.add(polygon.points.get(index));
+    }
+    index = (index + 1) % polygon.points.size();
+  }
 
   stack.push(first);
   stack.push(sortedPoints.get(1));
 
-  
   for (int i = 2; i < sortedPoints.size(); i++) {
-    println(sortedPoints.get(i).y, sortedPoints.get(i).x);
+    PVector vi = sortedPoints.get(i);
+    PVector stackTop = stack.peek();
+    boolean correctLine = true;
+    int checkPath = samePath(vi, stackTop, right, left);
+    if (checkPath == 0 || checkPath == 1) {
+      while (stack.size() >= 2 && correctLine) {
+        PVector vj = stack.pop();
+        PVector vk = stack.pop();
+        if ((checkLeftTurnCriterion(vk, vj, vi) && checkPath == 0) || (!checkLeftTurnCriterion(vk, vj, vi) && checkPath == 1)) {
+          result.add(new Line(vi.x, vi.y, vk.x, vk.y, lineColor));
+          stack.push(vk);
+        } else {
+          stack.push(vk);
+          stack.push(vj);
+          correctLine = false;
+        }
+      }
+    } else {
+      while (stack.size() > 0) {
+        PVector v = stack.pop();
+        result.add(new Line(vi.x, vi.y, v.x, v.y, lineColor));
+      }
+      stack.push(stackTop);
+      stack.push(vi);
+    }
   }
 
-  print(first);
-  print(last);
-
+  result.addAll(polygon.lines);
   return result;
+}
+
+/*
+Return values:
+0 - both points on right path
+1 - both points on left path
+2 - points arent on the same path
+*/
+int samePath(PVector p1, PVector p2, ArrayList<PVector> right, ArrayList<PVector> left) {
+  if (right.contains(p1) && right.contains(p2)) {
+    return 0;
+  }
+  if (left.contains(p1) && left.contains(p2)) {
+    return 1;
+  }
+  return 2;
 }
 
 ArrayList<ActiveEdge> delaunay(ArrayList<PVector> points) {
