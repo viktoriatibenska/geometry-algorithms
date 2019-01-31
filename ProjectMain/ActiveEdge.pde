@@ -16,6 +16,11 @@ public class ActiveEdge {
         this.to = temp;
     }
 
+    public ActiveEdge getOppositeOrientation() {
+        ActiveEdge result = new ActiveEdge(this.to, this.from);
+        return result;
+    }
+
     public void setNext(ActiveEdge next) {
         this.next = next;
     }

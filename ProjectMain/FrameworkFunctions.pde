@@ -73,6 +73,7 @@ ArrayList<PVector> removePoint(ArrayList<PVector> points) {
   for (PVector p : points) {
     /* Check whether mouse is over current point, and if so, remove it. */
     if (overPoint(p.x, p.y)) {
+      println("Deleting point: ", p);
       points.remove(p);
       break;
     }
