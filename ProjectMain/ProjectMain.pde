@@ -153,6 +153,7 @@ void draw() {
   for (PVector p : points) {
     fill(255);
     ellipse(p.x, p.y, pointDiameter, pointDiameter);
+    text(p.toString(), p.x + 10, p.y);
   }
   
   drawButton(btnHighlight, randomBtnOver, randomBtnX);

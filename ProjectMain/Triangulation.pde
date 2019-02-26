@@ -7,6 +7,13 @@ ArrayList<Line> sweepLine(Polygon polygon) {
   ArrayList<PVector> right = new ArrayList<PVector>();
   ArrayList<PVector> left = new ArrayList<PVector>();
 
+  /*
+  println("Polygon points order:");
+  for (PVector p: polygon.getPoints()){
+    println(p);
+  }
+  */
+
   // Sort points lexicographically
   ArrayList<PVector> sortedPoints = polygon.sortPoints();
   PVector first = sortedPoints.get(0);
@@ -34,6 +41,18 @@ ArrayList<Line> sweepLine(Polygon polygon) {
     }
     index = (index + 1) % polygon.points.size();
   }
+  
+  /*
+  println("Left path");
+  for (PVector p: left){
+    println(p);
+  }
+
+  println("Right path");
+  for (PVector p: right){
+    println(p);
+  }
+  */
 
   stack.push(first);
   stack.push(sortedPoints.get(1));
@@ -43,6 +62,7 @@ ArrayList<Line> sweepLine(Polygon polygon) {
     PVector stackTop = stack.peek();
     boolean correctLine = true;
     int checkPath = samePath(vi, stackTop, right, left);
+    println("Current: ", vi, " ... StackTop: ", stackTop, " ... Path: ", pathName(checkPath));
     if (checkPath == 0 || checkPath == 1) {
       while (stack.size() >= 2 && correctLine) {
         PVector vj = stack.pop();
@@ -62,12 +82,22 @@ ArrayList<Line> sweepLine(Polygon polygon) {
         result.add(new Line(vi.x, vi.y, v.x, v.y, lineColor));
       }
       stack.push(stackTop);
-      stack.push(vi);
     }
+    stack.push(vi);
   }
 
   result.addAll(polygon.lines);
   return result;
+}
+
+String pathName(int value) {
+  if (value == 0) {
+    return "both right";
+  } else if (value == 1) {
+    return "both left";
+  } else {
+    return "different";
+  }
 }
 
 /*
