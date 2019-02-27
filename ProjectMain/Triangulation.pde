@@ -159,6 +159,10 @@ ArrayList<ActiveEdge> delaunay(ArrayList<PVector> points) {
   DT.add(e1);
   DT.add(e2);
   DT.add(e3);
+  /*println("Triangle:");
+  printEdge(e1);
+  printEdge(e2);
+  printEdge(e3);*/
 
   while (AEL.size() > 0) {
     ActiveEdge e = AEL.get(0);
@@ -187,15 +191,23 @@ ArrayList<ActiveEdge> delaunay(ArrayList<PVector> points) {
       } else if (!isInList(e3, DT)) {
         AEL.add(e3);
       }
-      DT.add(e);
+      DT.add(twin);
       DT.add(e2);
       DT.add(e3);
+      /*println("Triangle:");
+      printEdge(twin);
+      printEdge(e2);
+      printEdge(e3);*/
     }
     e.setTwin(twin);
     AEL.remove(e);
   }
 
   return DT;
+}
+
+void printEdge(ActiveEdge e) {
+  println("Edge: [", e.from.x, e.from.y, "] -> [", e.to.x, e.to.y, "]");
 }
 
 ArrayList<Line> voronoi(ArrayList<ActiveEdge> dt) {
