@@ -153,7 +153,7 @@ void draw() {
   for (PVector p : points) {
     fill(255);
     ellipse(p.x, p.y, pointDiameter, pointDiameter);
-    text(p.toString(), p.x + 10, p.y);
+    // text(p.toString(), p.x + 10, p.y);
   }
   
   drawButton(btnHighlight, randomBtnOver, randomBtnX);
@@ -353,7 +353,6 @@ void createPolygon() {
 /* Function generates new random points.
    The number of points generates is "randomPointsNum". */
 void generateRandomPoints() {
-  println("GENERATING RANDOM POINTS");
   float x, y;
   
   for (int i = 0; i < randomPointsNum; i++) {

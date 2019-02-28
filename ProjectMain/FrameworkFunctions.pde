@@ -61,19 +61,16 @@ boolean overBtn(int x, int y, int width, int height)  {
 
 /* Function adds point at current mouse position. */
 ArrayList<PVector> addPoint(ArrayList<PVector> points) {
-  println("ADDING POINT");
   points.add(new PVector(mouseX, mouseY));
   return points;
 }
 
 /* Function deletes a point at the current mouse position, if there is one. */
 ArrayList<PVector> removePoint(ArrayList<PVector> points) {
-  println("REMOVING POINT");
   /* Go through the list of points */
   for (PVector p : points) {
     /* Check whether mouse is over current point, and if so, remove it. */
     if (overPoint(p.x, p.y)) {
-      println("Deleting point: ", p);
       points.remove(p);
       break;
     }

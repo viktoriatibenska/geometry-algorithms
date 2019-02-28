@@ -11,3 +11,4 @@ Click draw polygon button.
 SWEEP LINE TRIANGULATION
 Sweep line triangulation requires polygon to be created.
 You can create polygon by using graham scan, gift wrapping or creating custom polygon.
+Sweep line works vertically.

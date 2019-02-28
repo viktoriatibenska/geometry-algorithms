@@ -7,13 +7,6 @@ ArrayList<Line> sweepLine(Polygon polygon) {
   ArrayList<PVector> right = new ArrayList<PVector>();
   ArrayList<PVector> left = new ArrayList<PVector>();
 
-  /*
-  println("Polygon points order:");
-  for (PVector p: polygon.getPoints()){
-    println(p);
-  }
-  */
-
   // Sort points lexicographically
   ArrayList<PVector> sortedPoints = polygon.sortPoints();
   PVector first = sortedPoints.get(0);
@@ -41,18 +34,6 @@ ArrayList<Line> sweepLine(Polygon polygon) {
     }
     index = (index + 1) % polygon.points.size();
   }
-  
-  /*
-  println("Left path");
-  for (PVector p: left){
-    println(p);
-  }
-
-  println("Right path");
-  for (PVector p: right){
-    println(p);
-  }
-  */
 
   stack.push(first);
   stack.push(sortedPoints.get(1));
@@ -62,7 +43,6 @@ ArrayList<Line> sweepLine(Polygon polygon) {
     PVector stackTop = stack.peek();
     boolean correctLine = true;
     int checkPath = samePath(vi, stackTop, right, left);
-    println("Current: ", vi, " ... StackTop: ", stackTop, " ... Path: ", pathName(checkPath));
     if (checkPath == 0 || checkPath == 1) {
       while (stack.size() >= 2 && correctLine) {
         PVector vj = stack.pop();
@@ -159,10 +139,6 @@ ArrayList<ActiveEdge> delaunay(ArrayList<PVector> points) {
   DT.add(e1);
   DT.add(e2);
   DT.add(e3);
-  /*println("Triangle:");
-  printEdge(e1);
-  printEdge(e2);
-  printEdge(e3);*/
 
   while (AEL.size() > 0) {
     ActiveEdge e = AEL.get(0);
@@ -177,9 +153,9 @@ ArrayList<ActiveEdge> delaunay(ArrayList<PVector> points) {
       e3.setNext(twin);
       e2.setTwin(e2.getOppositeOrientation());
       e3.setTwin(e3.getOppositeOrientation());
-      twin.twin.setTwin(e3);
-      e2.twin.setTwin(twin);
-      e3.twin.setTwin(e2);
+      twin.twin.setNext(e3);
+      e2.twin.setNext(twin);
+      e3.twin.setNext(e2);
 
       if (isInList(e2.twin, AEL)) {
         AEL.remove(e2);
@@ -194,10 +170,6 @@ ArrayList<ActiveEdge> delaunay(ArrayList<PVector> points) {
       DT.add(twin);
       DT.add(e2);
       DT.add(e3);
-      /*println("Triangle:");
-      printEdge(twin);
-      printEdge(e2);
-      printEdge(e3);*/
     }
     e.setTwin(twin);
     AEL.remove(e);
@@ -216,28 +188,28 @@ ArrayList<Line> voronoi(ArrayList<ActiveEdge> dt) {
   ArrayList<Line> voronoiLines = new ArrayList<Line>();
   ArrayList<ArrayList<ActiveEdge>> previousTriplets = new ArrayList<ArrayList<ActiveEdge>>();
 
-  for (int i = 0; i < dt.size(); i++) {
+  for (int i = 0; i < dt.size(); i+=3) {
     ArrayList<ActiveEdge> edges = new ArrayList<ActiveEdge>();
-    edges.add(dt.get(i));
-    edges.add(edges.get(edges.size()-1).next);
-    edges.add(edges.get(edges.size()-1).next);
-    Circle circle = circumscribe(edges.get(0).from, edges.get(1).from, edges.get(2).from);
-    if (circle != null && uniqueEdges(edges, previousTriplets)) {
-      for (ActiveEdge e: edges) {
-        if (e.twin != null && e.twin.next != null) {
-          Circle neighbourCircle = circumscribe(e.from, e.to, e.twin.next.to);
-          if (neighbourCircle != null) {
-            voronoiLines.add(new Line(circle.center.x, circle.center.y, neighbourCircle.center.x, neighbourCircle.center.y, lineColor));
-          }
-        }
-        if (e.twin.next == null) {
-          PVector perpendicular = e.perpendicularVector();
-          PVector endPoint = new PVector(circle.center.x + perpendicular.x * circle.radius * 5, circle.center.y + perpendicular.y * circle.radius * 5);
-          voronoiLines.add(new Line(circle.center.x, circle.center.y, endPoint.x, endPoint.y, lineColor));
+    ActiveEdge e1 = dt.get(i);
+    ActiveEdge e2 = dt.get(i+1);
+    ActiveEdge e3 = dt.get(i+2);
+    edges.add(e1);
+    edges.add(e2);
+    edges.add(e3);
+    Circle circle = circumscribe(e1.from, e2.from, e3.from);
+    for (ActiveEdge e: edges) {
+      if (e.twin != null && e.twin.next != null) {
+        Circle neighbourCircle = circumscribe(e.from, e.to, e.twin.next.to);
+        if (neighbourCircle != null) {
+          voronoiLines.add(new Line(circle.center.x, circle.center.y, neighbourCircle.center.x, neighbourCircle.center.y, lineColor));
         }
       }
+      if (e.twin.next == null) {
+        PVector perpendicular = e.perpendicularVector();
+        PVector endPoint = new PVector(circle.center.x + perpendicular.x * 2000, circle.center.y + perpendicular.y * 2000);
+        voronoiLines.add(new Line(circle.center.x, circle.center.y, endPoint.x, endPoint.y, lineColor));
+      }
     }
-    previousTriplets.add(edges);
   }
 
   return voronoiLines;
@@ -268,14 +240,12 @@ RealPoint findClosestDelaunay(ActiveEdge e, ArrayList<RealPoint> points) {
   for (RealPoint p: points) {
     if (!p.equals(e.from) && !p.equals(e.to)) {
       float currentDistance = delaunayDistance(e.from, e.to, p);
-      //println("Distance for", p, "is", currentDistance, "left:", isLeft(e, p));
       if (isLeft(e, p) && currentDistance < distance) {
         result = p;
         distance = currentDistance;
       }
     }
   }
-  // println("Delaunay distance:", result, distance);
   return result;
 }
 
